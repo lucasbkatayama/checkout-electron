@@ -5,6 +5,9 @@ const productLines = (state=[], action) => {
                 ...state,
                 action.productLine
             ];
+        case 'PRODUCT_LIST_SET':
+            return action.productsList;
+            break;
         case 'PRODUCT_LINE_UPDATE':
             return state.map(product =>
                 (product._id === action.productLine._id)

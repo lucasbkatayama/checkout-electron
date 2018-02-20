@@ -5,6 +5,8 @@ const ordersListLines = (state=[], action) => {
                 action.order,
                 ...state
             ];
+        case 'ORDERS_LIST_SET':
+            return action.ordersList;
         case 'ORDERS_LIST_RESET':
             return [];
         default:

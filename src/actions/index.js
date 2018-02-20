@@ -142,6 +142,10 @@ export function saveCashFund(amount)
 export const resetProductsLines = () => ({
     'type': 'RESET_PRODUCT_LINES'
 })
+export const setProductList = (productsList) => ({
+    'type': 'PRODUCT_LIST_SET',
+    productsList
+})
 export const addProductLine = (productLine) => ({
     'type': 'PRODUCT_LINE_ADD',
     productLine
@@ -167,9 +171,12 @@ export function refreshProductsList()
 
 export function loadProductsList(product)
 {
+    let products = [];
     return function (dispatch, getState) {
-        productsDb.select(function(product) {
-            dispatch(addProductLine(product));
+        productsDb.searchSync().then((products) => {
+            dispatch(setProductList(products));
+        }).catch((error) => {
+            smalltalk.alert('Technical error', error);
         });
     };
 }
@@ -282,6 +289,10 @@ export const resetOrdersListLines = (order) => ({
     'type': 'ORDERS_LIST_RESET',
     order
 })
+export const setOrdersList = (ordersList) => ({
+    'type': 'ORDERS_LIST_SET',
+    ordersList
+})
 export const addOrdersListLine = (order) => ({
     'type': 'ORDERS_LIST_LINES_ADD',
     order
@@ -298,12 +309,16 @@ export function saveInvoiceInformationsForOrder(order, successCallback, errorCal
 }
 
 export function loadOrdersList()
-{
-    return function (dispatch, getState) {
-        ordersDb.select(function(order) {
-            dispatch(addOrdersListLine(order));
-        });
-    };
+{{
+    return function (dispatch, getState)
+    {
+        ordersDb.searchSync().then((orders) => {
+                dispatch(setOrdersList(orders));
+            }).catch((error) => {
+                smalltalk.alert('Technical error', error);
+            });
+        };
+    }
 }
 
 export function deleteAllOrders()
