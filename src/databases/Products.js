@@ -19,8 +19,24 @@ class Products
         });
     }
 
+    filterProduct(product, errorCallback = (p) => {})
+    {
+        let origin = JSON.parse(JSON.stringify(product));
+        if (!isNaN(product.ean)) {
+            product.ean = parseInt(product.ean);
+        }
+        if (isNaN(product.ean)) {
+            product.ean = '9' + Math.floor(Math.random() * Math.floor(99999999999999));
+            errorCallback('Product <'+origin.ean+'> is not a valid EAN - Auto generated EAN : <'+product.ean+'>');
+        }
+
+        return product;
+    }
+
     create(product, successCallback = (p) => {}, errorCallback = (p) => {})
     {
+        product = this.filterProduct(product, errorCallback);
+
         this.db.insert(product, function (err, newDoc) {
             if (null == err) {
                 successCallback(newDoc);
@@ -32,6 +48,8 @@ class Products
 
     update(product, successCallback = (p) => {}, errorCallback = (p) => {})
     {
+        product = this.filterProduct(product, errorCallback);
+
         this.db.update(
             {_id: product._id},
             product,
@@ -48,6 +66,8 @@ class Products
 
     updateOrInsert(product, successCallback = (p) => {}, errorCallback = (p) => {})
     {
+        product = this.filterProduct(product, errorCallback);
+
         this.db.update(
             {ean: product.ean},
             product,
@@ -64,7 +84,7 @@ class Products
 
     select(callback)
     {
-        this.db.find({}).sort({ category: 1, name:1 }).exec(function(err, docs) {
+        this.db.find({}).sort({ category: 1, name: 1 }).exec(function(err, docs) {
             docs.map((item, index) => {
                 return callback(item);
             });
@@ -73,6 +93,10 @@ class Products
 
     searchByEan(filters, callback)
     {
+        if (!isNaN(filters.ean)) {
+            filters.ean = parseInt(filters.ean);
+        }
+
         this.db.find({ean: filters.ean}).exec(function(err, docs) {
             if (docs.length === 0) {
                 smalltalk.alert('Recherche produit', 'Produit EAN <'+filters.ean+'> non trouvé');
